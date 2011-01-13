@@ -1,7 +1,8 @@
 class HourLogger
 
-    def initialize(month)
-        @month = month
+    def initialize
+        puts "Enter month:"
+        @month = gets.chomp.downcase
         @projects = []
     end
 
@@ -11,11 +12,10 @@ class HourLogger
 
     def addHours
         puts "Enter project name:"
-        name = gets.downcase
+        name = gets.chomp.downcase
         puts "Enter hours:"
         hours = gets.to_f
-
-        @projects.assoc(name)[1] += hours.to_f
+        @projects.assoc(name)[1] += hours
     end
 
     def print(project)
@@ -24,19 +24,24 @@ class HourLogger
     end
 
     def printAllProjects
-        @projects.each {|proj| puts proj[0] + ": " + proj[1] + " hours"}
+        @projects.each {|proj| puts proj[0] + ": " + proj[1].to_s + " hours"}
     end
 
     def save
         marshalDump = Marshal.dump(@projects)
-        file = File.new(@month, 'w')
+        file = File.new(@month.downcase, 'w')
         file << marshalDump
         file.close
+        puts @month << " saved"
     end
 
-    def read(month)
+    def read
+        puts "Enter month to load:"
+        month = gets.chomp.downcase
         file = File.open(month)
         @projects = Marshal.load(file)
+        @month = month
+        puts month << " loaded"
     end
 
 end
