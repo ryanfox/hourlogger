@@ -1,24 +1,26 @@
 class HourLogger
+
+    def initialize
+        puts "New hourlogger created"
+    end
     
-    def help
-        puts "Start new (m)onth, (l)oad existing month, (s)ave current month,
-              (c)reate new project, add (h)ours to existing project,
-              (p)rint project, print (a)ll projects, (h)elp, or (q)uit?"
+    def self.help
+        puts "Start new (m)onth, (l)oad existing month, (s)ave current month, (c)reate new project, add (h)ours to existing project, (p)rint project, print (a)ll projects, (h)elp, or (q)uit?"
     end
 
-    def addMonth
+    def self.addMonth
         puts "Enter month:"
         @month = gets.chomp!.downcase
         @projects = []
     end
 
-    def addProject
+    def self.addProject
         puts "Enter project name:"
         projName = gets.chomp!.downcase
         @projects << [projName, 0] unless @projects.assoc(projName)
     end
 
-    def addHours
+    def self.addHours
         puts "Enter project name:"
         name = gets.chomp!.downcase
         puts "Enter hours:"
@@ -26,7 +28,7 @@ class HourLogger
         @projects.assoc(name)[1] += hours
     end
 
-    def print
+    def self.print
         puts "Enter project name:"
         projName = gets.chomp!.downcase
         proj = @projects.assoc(projName)
@@ -34,20 +36,20 @@ class HourLogger
         puts proj[0] + ": " + proj[1].to_s + " hours"
     end
 
-    def printAllProjects
+    def self.printAllProjects
         puts @month <<":"
         @projects.each {|proj| puts proj[0] + ": " + proj[1].to_s + " hours"}
     end
 
-    def save
+    def self.save
         marshalDump = Marshal.dump(@projects)
-        file = File.new(@month.downcase, 'w')
+        file = File.new(@month.downcase << ".bak", 'w')
         file << marshalDump
         file.close
         puts @month << " saved"
     end
 
-    def read
+    def self.read
         puts "Enter month to load:"
         month = gets.chomp!.downcase
         file = File.open(month)
