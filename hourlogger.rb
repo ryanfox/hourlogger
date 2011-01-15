@@ -50,7 +50,7 @@ class HourLogger
 
     def self.save
         marshalDump = Marshal.dump(@projects)
-        file = File.new(@month.downcase << ".bak", 'w')
+        file = File.new(@month.downcase + ".bak", 'w')
         file << marshalDump
         file.close
         puts @month << " saved"
@@ -59,7 +59,7 @@ class HourLogger
     def self.read
         print "Enter month to load: "
         month = gets.chomp!.downcase
-        file = File.open(month << ".bak")
+        file = File.open(month + ".bak")
         @projects = Marshal.load(file)
         @month = month
         puts month << " loaded"
