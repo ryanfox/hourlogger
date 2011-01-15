@@ -5,31 +5,34 @@ class HourLogger
     end
     
     def self.help
-        puts "Start new (m)onth, (l)oad existing month, (s)ave current month, (c)reate new project, add (h)ours to existing project, (p)rint project, print (a)ll projects, (h)elp, or (q)uit?"
+        print "Start new (m)onth, (l)oad existing month, (s)ave current month,
+          (c)reate new project, add (h)ours to existing project,
+          (p)rint project, print all p(r)ojects, print all m(o)nths,
+          (h)elp, or (q)uit? "
     end
 
     def self.addMonth
-        puts "Enter month:"
+        print "Enter month: "
         @month = gets.chomp!.downcase
         @projects = []
     end
 
     def self.addProject
-        puts "Enter project name:"
+        print "Enter project name: "
         projName = gets.chomp!.downcase
         @projects << [projName, 0] unless @projects.assoc(projName)
     end
 
     def self.addHours
-        puts "Enter project name:"
+        print "Enter project name: "
         name = gets.chomp!.downcase
-        puts "Enter hours:"
+        print "Enter hours:"
         hours = gets.to_f
         @projects.assoc(name)[1] += hours
     end
 
-    def self.print
-        puts "Enter project name:"
+    def self.printProject
+        print "Enter project name: "
         projName = gets.chomp!.downcase
         proj = @projects.assoc(projName)
         puts @month << ":"
@@ -41,6 +44,10 @@ class HourLogger
         @projects.each {|proj| puts proj[0] + ": " + proj[1].to_s + " hours"}
     end
 
+    def self.printAllMonths
+        Dir["*.bak"].each {|month| puts month}
+    end
+
     def self.save
         marshalDump = Marshal.dump(@projects)
         file = File.new(@month.downcase << ".bak", 'w')
@@ -50,9 +57,9 @@ class HourLogger
     end
 
     def self.read
-        puts "Enter month to load:"
+        print "Enter month to load: "
         month = gets.chomp!.downcase
-        file = File.open(month)
+        file = File.open(month << ".bak")
         @projects = Marshal.load(file)
         @month = month
         puts month << " loaded"
@@ -64,7 +71,9 @@ class HourLogger
     # Main loop
     @quit = false
     until @quit
-        
+    
+        print "\n"
+        print "? "        
         input = gets.chomp!.downcase
         case input
             when "m" then addMonth
@@ -72,10 +81,11 @@ class HourLogger
             when "s" then save
             when "c" then addProject
             when "h" then addHours
-            when "p" then print
-            when "a" then printAllProjects
+            when "p" then printProject
+            when "r" then printAllProjects
+            when "o" then printAllMonths
             when "h" then help
-            when "q" then quit = true
+            when "q" then @quit = true
             else puts "Invalid input"
         end
     end
