@@ -1,3 +1,5 @@
+require 'yaml'
+
 class HourLogger
 
     def initialize
@@ -92,14 +94,13 @@ class HourLogger
     end
 
     def self.printAllMonths
-        Dir["*.bak"].each {|month| puts month[0..-5]}
+        Dir["*.yaml"].each {|month| puts month[0..-5]}
     end
 
     def self.save
         if @month
-            marshalDump = Marshal.dump(@projects)
-            file = File.new(@month.downcase + ".bak", 'w')
-            file << marshalDump
+            file = File.new(@month.downcase + ".yaml", "w")
+            YAML.dump(@projects, file)
             file.close
             puts @month + " saved"
         else
@@ -111,8 +112,8 @@ class HourLogger
         begin
             print "Enter month to load: "
             month = gets.chomp!.downcase
-            file = File.open(month + ".bak")
-            @projects = Marshal.load(file)
+            file = File.open(month + ".yaml")
+            @projects = YAML.load(file)
             @month = month
             puts month + " loaded"
         rescue
@@ -129,7 +130,7 @@ class HourLogger
         @quit = false
         until @quit
     
-            print "\n"
+            puts
             print "? "        
             input = gets.chomp!.downcase
             case input
