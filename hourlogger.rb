@@ -2,18 +2,31 @@ require 'yaml'
 
 class HourLogger
 
-    def initialize
-        puts "New hourlogger created"
+    @tries = 0
+
+    def self.tries
+        @tries += 1
+        @tries > 3
     end
     
     def self.help
-        print "Start new (m)onth, (l)oad existing month, (s)ave current month,
-          (c)reate new project, (a)dd hours to existing project,
-          (p)rint project, print all p(r)ojects, print all m(o)nths,
-          (h)elp, or (q)uit? "
+        print " Start new (m)onth\n" +
+              " (l)oad month\n" + 
+              " (s)ave month\n" + 
+              " (c)reate project\n" + 
+              " (a)dd hours to project\n" + 
+              " (p)rint project\n" +
+              " print all p(r)ojects\n" +
+              " print all m(o)nths\n" +
+              " (h)elp\n" +
+              " (q)uit? "
     end
 
     def self.addMonth
+        if tries
+            return
+        end
+
         done = false
         while done == false
             print "Enter month: "
@@ -26,27 +39,32 @@ class HourLogger
     end
 
     def self.addProject
-        if @month
-            done = false
-            while done == false
-                print "Enter project name: "
-                projName = gets.chomp!.downcase
-                if projName.length > 0
-                    done = true
-                end
-            end
-            @projects << [projName, 0] unless @projects.assoc(projName)
-        else
-            puts "Need to load a month first"
+        if @month.nil?
+            puts "No month loaded"
+            return
+        elsif tries
+            return
         end
+        
+        done = false
+        while done == false
+            print "Enter project name: "
+            projName = gets.chomp!.downcase
+            if projName.length > 0
+                done = true
+            end
+        end
+        @projects << [projName, 0] unless @projects.assoc(projName)
     end
 
     def self.addHours
         if @month.nil?
-            puts "Need to load a month first"
+            puts "No month loaded"
             return
         elsif @projects.length == 0
             puts "No projects to add to"
+            return
+        elsif tries
             return
         end
 
@@ -67,7 +85,10 @@ class HourLogger
         if @month.nil?
             puts "Need to load a month first"
             return
+        elsif tries
+            return
         end
+        
         print "Enter project name: "
         projName = gets.chomp!.downcase
         if @projects.assoc(projName).nil?
@@ -85,8 +106,12 @@ class HourLogger
         if @month.nil?
             puts "Need to load a month first"
             return
+        elsif tries
+            return
         end
+        
         puts @month + ":"
+        puts
         if @projects.length == 0
             puts "No projects in this month"
         end
@@ -94,7 +119,7 @@ class HourLogger
     end
 
     def self.printAllMonths
-        Dir["*.yaml"].each {|month| puts month[0..-5]}
+        Dir["*.yaml"].each {|month| puts month[0..-6]}
     end
 
     def self.save
@@ -110,6 +135,10 @@ class HourLogger
 
     def self.read
         begin
+            if tries
+                return
+            end
+            
             print "Enter month to load: "
             month = gets.chomp!.downcase
             file = File.open(month + ".yaml")
@@ -124,14 +153,16 @@ class HourLogger
 
     if __FILE__ == $0
         # Display help first time
+        puts "Hourlogger v0.0.1"
         help
 
         # Main loop
-        @quit = false
-        until @quit
-    
+        quit = false
+        until quit
+
+            @tries = 0
             puts
-            print "? "        
+            print "#@month? "        
             input = gets.chomp!.downcase
             case input
                 when "m" then addMonth
@@ -143,7 +174,7 @@ class HourLogger
                 when "r" then printAllProjects
                 when "o" then printAllMonths
                 when "h" then help
-                when "q" then @quit = true
+                when "q" then quit = true
                 else puts "Invalid input"
             end
         end
