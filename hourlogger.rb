@@ -1,8 +1,16 @@
+require 'rubygems'
+require 'dropbox'
 require 'yaml'
 
 class HourLogger
 
     @tries = 0
+	@login = false
+
+    settings = JSON.parse(File.read('keys.json'))
+    
+    @session = Dropbox::Session.new(settings['key'], settings['secret'])
+    @session.mode = :dropbox
 
     def self.tries
         @tries += 1
@@ -126,7 +134,16 @@ class HourLogger
         if @month
             file = File.new(@month.downcase + ".yaml", "w")
             YAML.dump(@projects, file)
-            file.close
+
+            unless @login
+		        puts "Visit #{@session.authorize_url} to log in. Hit enter when done."
+		        gets
+		        @session.authorize
+		        @login = true
+		    end
+
+		    file.close
+		    @session.upload(@month.downcase + ".yaml", '/')
             puts @month + " saved"
         else
             puts "Need to load a month first"
