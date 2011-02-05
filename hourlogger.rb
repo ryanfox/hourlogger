@@ -143,7 +143,7 @@ class HourLogger
 		    end
 
 		    file.close
-		    @session.upload(@month.downcase + ".yaml", '/')
+		    @session.upload(@month.downcase + ".yaml", '/hours')
             puts @month + " saved"
         else
             puts "Need to load a month first"
